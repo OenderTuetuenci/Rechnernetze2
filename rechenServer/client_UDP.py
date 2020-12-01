@@ -5,9 +5,9 @@ SERVER_IP = '127.0.0.1'
 SERVER_PORT = 50000
 
 
-sct = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sct = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sct.settimeout(10)
 
-sct.connect((SERVER_IP, SERVER_PORT))
 rechenopSum = "Summe".encode('utf-8')
 rechenopProc = "Produkt".encode('utf-8')
 rechenopMin = "Minimum".encode('utf-8')
@@ -32,8 +32,8 @@ zahlN = pack("c", b'4')
 rechenRequest_04 = id + rechenoperation + zahlN + zahlZ1 + zahlZ2 + zahlZ3 + zahlZ4
 
 
-sct.send(rechenRequest_01)
-ergebnis = sct.recv(1024)
+sct.sendto(rechenRequest_01, (SERVER_IP, SERVER_PORT))
+ergebnis, addr = sct.recvfrom(1024)
 
 idServer = unpack("I", ergebnis[0:4])
 result = unpack("i", ergebnis[4:])
@@ -41,24 +41,24 @@ result = unpack("i", ergebnis[4:])
 print("id: " + str(idServer[0]), "result: " + str(result[0]))
 
 
-sct.send(rechenRequest_02)
-ergebnis = sct.recv(1024)
+sct.sendto(rechenRequest_02, (SERVER_IP, SERVER_PORT))
+ergebnis, addr = sct.recvfrom(1024)
 
 idServer = unpack("I", ergebnis[0:4])
 result = unpack("i", ergebnis[4:])
 
 print("id: " + str(idServer[0]), "result: " + str(result[0]))
 
-sct.send(rechenRequest_03)
-ergebnis = sct.recv(1024)
+sct.sendto(rechenRequest_03, (SERVER_IP, SERVER_PORT))
+ergebnis, addr = sct.recvfrom(1024)
 
 idServer = unpack("I", ergebnis[0:4])
 result = unpack("i", ergebnis[4:])
 
 print("id: " + str(idServer[0]), "result: " + str(result[0]))
 
-sct.send(rechenRequest_04)
-ergebnis = sct.recv(1024)
+sct.sendto(rechenRequest_04, (SERVER_IP, SERVER_PORT))
+ergebnis, addr = sct.recvfrom(1024)
 
 idServer = unpack("I", ergebnis[0:4])
 result = unpack("i", ergebnis[4:])

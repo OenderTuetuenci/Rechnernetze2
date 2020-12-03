@@ -1,8 +1,12 @@
 import socket
 from struct import pack, unpack
 
-SERVER_IP = '127.0.0.1'
-SERVER_PORT = 50000
+#SERVER_IP = '127.0.0.1'
+SERVER_IP = "141.37.168.26"
+#SERVER_PORT = 50000
+SERVER_PORT = 7
+
+
 
 
 sct = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -34,7 +38,7 @@ rechenRequest_04 = id + rechenoperation + zahlN + zahlZ1 + zahlZ2 + zahlZ3 + zah
 
 sct.send(rechenRequest_01)
 ergebnis = sct.recv(1024)
-
+#print(ergebnis)
 idServer = unpack("I", ergebnis[0:4])
 result = unpack("i", ergebnis[4:])
 

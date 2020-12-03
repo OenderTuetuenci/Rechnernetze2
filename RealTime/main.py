@@ -37,7 +37,7 @@ def start_typ2(target_time, typ2, result, start_time):
         if actual_time > 1800/debug:
             endEv.set()
             break
-debug = 1000
+debug = 50
 backer = Station("Bäcker", 10/debug)
 wurst = Station("Wurst", 30/debug)
 kase = Station("Käse", 60/debug)

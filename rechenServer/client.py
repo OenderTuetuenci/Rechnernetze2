@@ -13,7 +13,7 @@ rechenopProc = "Produkt".encode('utf-8')
 rechenopMin = "Minimum".encode('utf-8')
 rechenopMax = "Maximum".encode('utf-8')
 
-id = pack("I", 1000)
+id = pack("I", 2)
 rechenoperation = pack("7s", rechenopSum)
 zahlN = pack("c", b'2')
 zahlZ1 = pack("i", 10)
@@ -64,3 +64,5 @@ idServer = unpack("I", ergebnis[0:4])
 result = unpack("i", ergebnis[4:])
 
 print("id: " + str(idServer[0]), "result: " + str(result[0]))
+while True:
+    i = 0

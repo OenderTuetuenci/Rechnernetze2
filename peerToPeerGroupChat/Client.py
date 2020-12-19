@@ -6,9 +6,9 @@ import time
 SERVER_IP = '127.0.0.1'
 SERVER_PORT = 50002
 
-UDP_Port = 25552
+UDP_Port = 25551
 CHAT_IP = '127.0.0.1'
-CHAT_Port = 60002
+CHAT_Port = 60001
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.connect((SERVER_IP, SERVER_PORT))
@@ -41,15 +41,17 @@ def listenServer():
     while run:
         try:
             data = server.recv(10000)
-            msg = unpack("cI", data[0:8])
-            length = msg[1]
-            msg = unpack("cI"+str(length)+"s",data)
-            clientList(msg[2])
+            if unpack("c").decode("utf-8") == "c":
+                msg = unpack("cI", data[0:8])
+                length = msg[1]
+                msg = unpack("cI"+str(length)+"s",data)
+                clientList(msg[2])
         except socket.timeout:
             print("Timeout")
 
 def listenudp():
     global run
+    global connected
     while run:
         try:
             data = udp.recv(1024)
@@ -60,6 +62,7 @@ def listenudp():
             ip = ip.split(",")
             chat.connect((ip[0],int(ip[1])))
             threading.Thread(target=chatf,args=(chat,)).start()
+            connected = True
         except socket.timeout:
             print("Timeout")
 
@@ -71,21 +74,32 @@ def clientList(list):
             attr = client.split(",")
             print(attr[0]," UDP-Port: ", attr[1] + "," + attr[2])
 
+def listenChat(conn):
+    while True :
+        try:
+            data = conn.recv(1024)
+            answer = unpack("cI", data[0:8])
+            length = answer[1]
+            answer = unpack("cI" + str(length) + "s", data)
+            print(answer[2].decode("UTF-8"))
+        except socket.timeout:
+            print("Timeout")
+
+
+
 def chatf(conn):
+    global connected
     conn.send(b'Chat startet')
     data = conn.recv(1024)
     print(data)
+    threading.Thread(target=listenChat, args=(conn,)).start()
     x = ""
     while x != "end chat":
-        x = input()
+        x = input("Nachricht:\n")
         length = len(x)
         msg = pack("cI"+str(length)+"s",b'm',length,x.encode())
         conn.send(msg)
-        data = conn.recv(1024)
-        answer = unpack("cI")
-        length = answer[1]
-        answer = unpack("cI"+str(length)+"s",data)
-        print(answer[2].decode("UTF-8"))
+    connected = False
 
 
 def sendConnectWithUser():
@@ -104,14 +118,24 @@ def sendConnectWithUser():
     except socket.timeout:
         print("Timeout")
 
+def deregister():
+    msg = pack("c",b'd')
+    server.send(msg)
+    server.close()
+
 
 
 listenServer = threading.Thread(target=listenServer).start()
 listenUDP = threading.Thread(target=listenudp).start()
 
 x = ""
+connected = False
 while x != "q":
-    x = input()
+    if not connected:
+        x = input("::")
     if x == "connect":
         sendConnectWithUser()
+        connected = True
+    if x == "deregister":
+        deregister()
 run = False

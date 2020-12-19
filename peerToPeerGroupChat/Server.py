@@ -60,6 +60,7 @@ def register(data, addr,thread):
 def deregister(conn,nickname):
     connList.remove(conn)
     conn.close()
+    nicKToAddr.pop(nickname)
     print("deregistering",nickname)
     client_list_broadcast()
 

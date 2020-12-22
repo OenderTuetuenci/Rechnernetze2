@@ -4,11 +4,11 @@ import threading
 import time
 
 SERVER_IP = '127.0.0.1'
-SERVER_PORT = 50002
+SERVER_PORT = 50001
 
-UDP_Port = 25551
+UDP_Port = 25552
 CHAT_IP = '127.0.0.1'
-CHAT_Port = 60001
+CHAT_Port = 60002
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.connect((SERVER_IP, SERVER_PORT))
@@ -35,13 +35,12 @@ while not succes:
         msg = unpack("c?I17s", data)
         print(msg[3].decode("utf-8"))
 
-
 def listenServer():
     global run
     while run:
         try:
             data = server.recv(10000)
-            if unpack("c").decode("utf-8") == "c":
+            if unpack("c",data[0:1])[0].decode("utf-8") == "c":
                 msg = unpack("cI", data[0:8])
                 length = msg[1]
                 msg = unpack("cI"+str(length)+"s",data)
@@ -81,11 +80,13 @@ def listenChat(conn):
             answer = unpack("cI", data[0:8])
             length = answer[1]
             answer = unpack("cI" + str(length) + "s", data)
-            print(answer[2].decode("UTF-8"))
+            print("Antwort:",answer[2].decode("UTF-8"))
+            if answer[2].decode("UTF-8") == "end chat":
+                conn.close()
+                break
         except socket.timeout:
             print("Timeout")
-
-
+    print("Ending Chat Thread")
 
 def chatf(conn):
     global connected
@@ -100,11 +101,13 @@ def chatf(conn):
         msg = pack("cI"+str(length)+"s",b'm',length,x.encode())
         conn.send(msg)
     connected = False
+    conn.close()
 
 
 def sendConnectWithUser():
     global chat
     user = input("Welchen User? IP,Port\n")
+    print(user)
     info = user.split(",")
     port = int(info[1])
     data = CHAT_IP + "," + str(CHAT_Port)
@@ -136,6 +139,8 @@ while x != "q":
     if x == "connect":
         sendConnectWithUser()
         connected = True
+        x = ""
     if x == "deregister":
         deregister()
+        x = ""
 run = False

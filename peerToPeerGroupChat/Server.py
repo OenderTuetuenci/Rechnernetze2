@@ -17,6 +17,7 @@ class connectionThread(Thread):
         while server:
             try:
                 data = self.conn.recv(1024)
+                print(data)
                 msg = chr(data[0])
                 print(msg)
                 if msg == 'r':
@@ -78,7 +79,7 @@ def client_list_broadcast():
 
 
 MY_IP = '127.0.0.1'
-MY_PORT = 50002
+MY_PORT = 50001
 server = True
 
 sct = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

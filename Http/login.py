@@ -2,8 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 
 url = 'https://moodle.htwg-konstanz.de/moodle/login/index.php'
-user = "oe391tue"
-password = "61trabzon61"
+user = ""
+password = ""
 request_data = {'username': user,
                 'password': password,
                 'logintoken': ''}

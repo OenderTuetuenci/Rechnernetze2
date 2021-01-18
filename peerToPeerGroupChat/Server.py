@@ -78,8 +78,8 @@ def client_list_broadcast():
 
 
 
-MY_IP = '127.0.0.1'
-MY_PORT = 50001
+MY_IP = '141.37.198.10'
+MY_PORT = 50000
 server = True
 
 sct = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

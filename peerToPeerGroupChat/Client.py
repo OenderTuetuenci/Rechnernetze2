@@ -3,12 +3,12 @@ from struct import pack, unpack
 import threading
 import time
 
-SERVER_IP = '127.0.0.1'
-SERVER_PORT = 50001
+SERVER_IP = '141.37.198.10'
+SERVER_PORT = 50000
 
 UDP_Port = 25552
-CHAT_IP = '127.0.0.1'
-CHAT_Port = 60002
+CHAT_IP = '141.37.198.10'
+CHAT_Port = 60000
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.connect((SERVER_IP, SERVER_PORT))

@@ -1,46 +1,44 @@
 import requests
 from bs4 import BeautifulSoup
 
-url = 'https://moodle.htwg-konstanz.de/moodle/login/index.php'
+# urls needed
+login_url = 'https://moodle.htwg-konstanz.de/moodle/login/index.php'
+download_url = "https://moodle.htwg-konstanz.de/moodle/pluginfile.php/188750/mod_assign/introattachment/0/AIN%20RN%20-%20Laboraufgabe%20-%20HTTP.pdf?forcedownload=1"
+chat_url = "https://moodle.htwg-konstanz.de/moodle/mod/chat/gui_basic/index.php?id=183"
+chat_interaction_url = "https://moodle.htwg-konstanz.de/moodle/mod/chat/gui_basic/index.php"
+
+# login data
 user = ""
 password = ""
-request_data = {'username': user,
-                'password': password,
-                'logintoken': ''}
 
 session = requests.Session()
 
 
+def extract_value(req, value):
+    soup = BeautifulSoup(req.text, "html.parser")
+    form = soup.find('form')
+    return form.find('input', {'name': value}).get('value')
+
+
 def login(session):
-    req = session.get(url)
-    request_data['logintoken'] = getLoginToken(req)
-    response = session.post(url, data=request_data)
+    print("try to login ...")
+    request_data = {'username': user,
+                    'password': password,
+                    'logintoken': ''}
+    req = session.get(login_url)
+    request_data['logintoken'] = extract_value(req, 'logintoken')
+    session.post(login_url, data=request_data)
+    print("logged in!")
 
-def getLoginToken(req):
-    soup = BeautifulSoup(req.text, "html.parser")
-    form = soup.find('form')
-    logintoken = form.find('input', {'name': 'logintoken'}).get('value')
-    return logintoken
-
-def getSesskey(req):
-    soup = BeautifulSoup(req.text, "html.parser")
-    form = soup.find('form')
-    sesskey = form.find('input', {'name': 'sesskey'}).get('value')
-    return sesskey
-
-def getLast(req):
-    soup = BeautifulSoup(req.text, "html.parser")
-    form = soup.find('form')
-    last = form.find('input', {'name': 'last'}).get('value')
-    return last
 
 def download(session):
-    url = "https://moodle.htwg-konstanz.de/moodle/pluginfile.php/188750/mod_assign/introattachment/0/AIN%20RN%20-%20Laboraufgabe%20-%20HTTP.pdf?forcedownload=1"
-    req = session.get(url)
-    with open("Rechnernetze1.pdf","wb") as f:
+    req = session.get(download_url)
+    with open("Rechnernetze.pdf", "wb") as f:
         f.write(req.content)
+    print("downloaded file")
 
-def getmsgs(session,sesskey,last):
+
+def getmsgs(session, sesskey, last):
     message_data = {
         "message": "",
         "id": "183",
@@ -49,9 +47,13 @@ def getmsgs(session,sesskey,last):
         "sesskey": sesskey,
         "refresh": "Aktualisieren"
     }
-    req = session.post("https://moodle.htwg-konstanz.de/moodle/mod/chat/gui_basic/index.php", message_data)
+    req = session.post(chat_interaction_url, message_data)
+    with open("msg.html", "wb") as f:
+        f.write(req.content)
+    print("message refreshed")
 
-def send(session,sesskey,last,message):
+
+def send(session, sesskey, last, message):
     message_data = {
         "message": message,
         "id": "183",
@@ -59,54 +61,54 @@ def send(session,sesskey,last,message):
         "last": last,
         "sesskey": sesskey
     }
-    req = session.post("https://moodle.htwg-konstanz.de/moodle/mod/chat/gui_basic/index.php", message_data)
-    with open("nachrichten.html","wb") as f:
-        f.write(req.text)
+    session.post(chat_interaction_url, message_data)
+    print("message send")
 
 
 def chat(session):
-    url = "https://moodle.htwg-konstanz.de/moodle/mod/chat/gui_basic/index.php?id=183"
+    print("start chat")
+    url = chat_url
     req = session.get(url)
-    sesskey = getSesskey(req)
-    last = getLast(req)
+    sesskey = extract_value(req, 'sesskey')
+    last = extract_value(req, 'last')
     inp = ""
     while inp != "q":
-        inp = input()
+        inp = input(
+            "Enter command: a -> Nachrichten aktualisieren, s -> Nachricht senden")
         if inp == "a":
-            getmsgs(session,sesskey,last)
-        elif inp =="s":
-            message = input("Nachricht:")
-            send(session,sesskey,last,message)
+            getmsgs(session, sesskey, last)
+        elif inp == "s":
+            message = input("Nachricht eingeben:")
+            send(session, sesskey, last, message)
+    print("end chat")
 
-def getHeaders(req):
-    soup = BeautifulSoup(req.text, "html.parser")
-    form = soup.find('form')
-    print(req.text)
+
+def get_headers(req):
     header = {}
-    header["lastmodified"] = form.find('input', {'name': 'lastmodified'}).get('value')
-    header["id"] = form.find('input', {'name': 'id'}).get('value')
-    header["userid"] = form.find('input', {'name': 'userid'}).get('value')
-    header["action"] = form.find('input', {'name': 'action'}).get('value')
-    header["sesskey"] = form.find('input', {'name': 'sesskey'}).get('value')
-    header["_qf__mod_assign_submission_form"] = form.find('input', {'name': '_qf__mod_assign_submission_form'}).get('value')
-    header["files_filemanager"] = form.find('input', {'name': 'files_filemanager'}).get('value')
+    header["lastmodified"] = extract_value(req, 'lastmodified')
+    header["id"] = extract_value(req, 'id')
+    header["userid"] = extract_value(req, 'userid')
+    header["action"] = extract_value(req, 'action')
+    header["sesskey"] = extract_value(req, 'sesskey')
+    header["_qf__mod_assign_submission_form"] = extract_value(
+        req, '_qf__mod_assign_submission_form')
+    header["files_filemanager"] = extract_value(req, 'files_filemanager')
     header["submitbutton"] = "%C3%84nderungen+sichern"
     return header
 
+
 def upload(session):
-    req = session.get("https://moodle.htwg-konstanz.de/moodle/mod/assign/view.php?id=118815")
+    # req = session.get("https://moodle.htwg-konstanz.de/moodle/mod/assign/view.php?id=118815")
     url = "https://moodle.htwg-konstanz.de/moodle/repository/repository_ajax.php?action=upload"
     files = {'file': open('Rechnernetze.pdf', 'rb')}
-    req = session.post(url,files=files)
+    req = session.post(url, files=files)
     print(req.text)
-    #headers = getHeaders(req)
+    #headers = get_headers(req)
     #url = "https://moodle.htwg-konstanz.de/moodle/mod/assign/view.php"
     #req = session.post(url,headers)
 
+# excecution
 login(session)
-#download(session)
-#chat(session)
-upload(session)
-
-
-
+download(session)
+chat(session)
+# upload(session)

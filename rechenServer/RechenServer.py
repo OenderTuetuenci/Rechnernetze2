@@ -4,10 +4,22 @@ from struct import pack, unpack
 import math
 import threading
 
+def rl(sock):
+    n=0
+    c=1
+    while c:
+        c=sock.recv(1)
+        print(c)
+        if c==b'\n':
+            return n
+        n+=1
+    return ''
+
 def handleMessage():
     try:
         while True:
-            data = conn.recv(1024)
+            print(rl(conn))
+            data = conn.recv(1014)
 
             if data:
                 sendMessage(data)
@@ -43,7 +55,7 @@ def sendMessage(data):
 
 
 MY_IP = '127.0.0.1'
-MY_PORT = 50000
+MY_PORT = 50001
 server_activity_period = 30
 
 sct = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

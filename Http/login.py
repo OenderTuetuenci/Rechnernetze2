@@ -8,8 +8,8 @@ chat_url = "https://moodle.htwg-konstanz.de/moodle/mod/chat/gui_basic/index.php?
 chat_interaction_url = "https://moodle.htwg-konstanz.de/moodle/mod/chat/gui_basic/index.php"
 
 # login data
-user = ""
-password = ""
+user = "rnetin"
+password = "ntsmobil"
 
 session = requests.Session()
 
@@ -109,6 +109,6 @@ def upload(session):
 
 # excecution
 login(session)
-download(session)
-chat(session)
-# upload(session)
+#download(session)
+#chat(session)
+upload(session)

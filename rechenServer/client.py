@@ -1,10 +1,10 @@
 import socket
 from struct import pack, unpack
 
-#SERVER_IP = '127.0.0.1'
-SERVER_IP = "141.37.168.26"
-#SERVER_PORT = 50000
-SERVER_PORT = 7
+SERVER_IP = '127.0.0.1'
+#SERVER_IP = "141.37.168.26"
+SERVER_PORT = 50001
+#SERVER_PORT = 7
 
 
 

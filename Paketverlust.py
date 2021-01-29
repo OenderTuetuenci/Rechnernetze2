@@ -1,8 +1,8 @@
-puffergroße = int(input("Puffer"))
-ubertragungankommen = float(input("ubertragungankommen"))
-ubertragungsenden = float(input("ubertragungsenden"))
-anzahlPakete = float(input("anzahl Pakete"))
-bereitsVerloren = input("bereits verloren: ").replace(" ", "").split(",")
+puffergroße = int(input("Puffer (in Paketen): "))
+ubertragungankommen = float(input("Uebertragungsverzögerung ankommend (in ms): "))
+ubertragungsenden = float(input("Uebertragungsverzögerung abgehend (in ms): "))
+anzahlPakete = float(input("Gesamte Anzahl zu sendende Pakete (in Pakete): "))
+bereitsVerloren = input("bereits verloren Pakete (ggf voraufgabe, in Pakete): ").replace(" ", "").split(",")
 
 import queue
 
